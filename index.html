@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Ulang Kaji Geografi T2</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-serif-title { font-family: 'Playfair Display', serif; }
+        
+        @media print {
+            body * { visibility: hidden; }
+            #certContainer, #certContainer * { visibility: visible; }
+            #certContainer { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-12">
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+        <!-- HEADER BANNER -->
+        <div class="bg-gradient-to-r from-indigo-700 via-indigo-600 to-purple-600 rounded-2xl p-6 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-amber-300 shadow-inner">
+                    <i data-lucide="globe" class="w-8 h-8"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight">Geografi Tingkatan 2</h1>
+                    <p class="text-xs text-indigo-100 mt-0.5">Bahagian C: Soalan Ulang Kaji Interaktif</p>
+                </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 px-5 flex items-center gap-4">
+                <div>
+                    <p class="text-[10px] uppercase font-bold text-indigo-200 tracking-wider">JUMLAH MARKAH</p>
+                    <p id="totalScoreDisplay" class="text-2xl font-black text-amber-300">0 / 80</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center">
+                    <i data-lucide="trophy" class="w-5 h-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOPIK SELECTION GRID -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- Topik 1 -->
+            <button onclick="switchTopic(1)" id="topic-card-1" class="topic-card bg-white p-5 rounded-2xl border-2 border-indigo-600 shadow-sm text-left transition relative overflow-hidden group">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+                    <i data-lucide="car" class="w-5 h-5"></i>
+                </div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase">TOPIK 1</p>
+                <h3 class="font-extrabold text-slate-800 text-sm">Pengangkutan</h3>
+                <p id="prog-1" class="text-xs font-semibold text-emerald-600 mt-2">0/20 Dibereskan</p>
+            </button>
+
+            <!-- Topik 2 -->
+            <button onclick="switchTopic(2)" id="topic-card-2" class="topic-card bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm text-left transition relative overflow-hidden group hover:border-indigo-300">
+                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-3">
+                    <i data-lucide="radio" class="w-5 h-5"></i>
+                </div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase">TOPIK 2</p>
+                <h3 class="font-extrabold text-slate-800 text-sm">Telekomunikasi</h3>
+                <p id="prog-2" class="text-xs font-semibold text-slate-400 mt-2">0/20 Dibereskan</p>
+            </button>
+
+            <!-- Topik 3 -->
+            <button onclick="switchTopic(3)" id="topic-card-3" class="topic-card bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm text-left transition relative overflow-hidden group hover:border-indigo-300">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+                    <i data-lucide="thermometer-sun" class="w-5 h-5"></i>
+                </div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase">TOPIK 3</p>
+                <h3 class="font-extrabold text-slate-800 text-sm">Pemanasan Global</h3>
+                <p id="prog-3" class="text-xs font-semibold text-slate-400 mt-2">0/20 Dibereskan</p>
+            </button>
+
+            <!-- Topik 4 -->
+            <button onclick="switchTopic(4)" id="topic-card-4" class="topic-card bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm text-left transition relative overflow-hidden group hover:border-indigo-300">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+                    <i data-lucide="leaf" class="w-5 h-5"></i>
+                </div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase">TOPIK 4</p>
+                <h3 class="font-extrabold text-slate-800 text-sm">Teknologi Hijau</h3>
+                <p id="prog-4" class="text-xs font-semibold text-slate-400 mt-2">0/20 Dibereskan</p>
+            </button>
+        </div>
+
+        <!-- CURRENT TOPIK INFO HEADER -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span id="topicBadge" class="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-700 font-bold text-xs">Topik 1</span>
+                    <h2 id="topicTitle" class="text-xl font-black text-slate-800">Topik 1: Pengangkutan</h2>
+                </div>
+                <p id="topicDesc" class="text-xs text-slate-500 mt-1">Faktor pembinaan jaringan pengangkutan & kepentingan pengangkutan darat.</p>
+            </div>
+            <button onclick="openModal('notesModal')" class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center gap-2 transition border border-indigo-100">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
+                <span>Nota Ringkas Topik Ini</span>
+            </button>
+        </div>
+
+        <!-- ACTIVITI TABS -->
+        <div class="flex gap-3 border-b border-slate-200 pb-2 overflow-x-auto">
+            <button onclick="switchActivity(1)" id="act-tab-1" class="act-tab px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 bg-indigo-600 text-white shadow-sm">
+                <i data-lucide="list-todo" class="w-4 h-4"></i>
+                <span>Aktiviti 1: Kuiz MCQ</span>
+                <span class="px-1.5 py-0.5 rounded bg-indigo-700 text-[10px]">7 Soalan</span>
+            </button>
+            <button onclick="switchActivity(2)" id="act-tab-2" class="act-tab px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-50 border border-slate-200">
+                <i data-lucide="puzzle" class="w-4 h-4"></i>
+                <span>Aktiviti 2: Padankan Fakta</span>
+                <span class="px-1.5 py-0.5 rounded bg-slate-100 text-[10px]">6 Pasangan</span>
+            </button>
+            <button onclick="switchActivity(3)" id="act-tab-3" class="act-tab px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-50 border border-slate-200">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                <span>Aktiviti 3: Benar / Palsu</span>
+                <span class="px-1.5 py-0.5 rounded bg-slate-100 text-[10px]">7 Soalan</span>
+            </button>
+        </div>
+
+        <!-- ACTIVITY DISPLAY CARD -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm min-h-[380px] flex flex-col justify-between">
+            
+            <!-- ACTIVITI 1: QUIZ -->
+            <div id="activity-1" class="activity-panel space-y-5">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-100 pb-3">
+                    <span id="quizProgress">Soalan 1 daripada 7</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">Pilihan Berganda</span>
+                </div>
+                <h3 id="quizQuestion" class="text-base sm:text-lg font-bold text-slate-800 leading-relaxed">
+                    Soalan sedang dimuatkan...
+                </h3>
+                <div id="quizOptions" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                <div id="quizFeedback" class="hidden p-4 rounded-xl border text-xs font-medium"></div>
+            </div>
+
+            <!-- ACTIVITI 2: MATCHING -->
+            <div id="activity-2" class="activity-panel hidden space-y-5">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-100 pb-3">
+                    <span>Klik Fakta kemudian klik Huraian yang sepadan</span>
+                    <span id="matchProgress" class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-600">0 / 6 Padanan</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2">FAKTA</h4>
+                        <div id="factsList" class="space-y-2"></div>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2">HURAIAN</h4>
+                        <div id="descList" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTIVITI 3: TRUE / FALSE -->
+            <div id="activity-3" class="activity-panel hidden space-y-5">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-100 pb-3">
+                    <span id="tfProgress">Soalan 1 daripada 7</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">Benar atau Palsu</span>
+                </div>
+                <h3 id="tfQuestion" class="text-base sm:text-lg font-bold text-slate-800 leading-relaxed">
+                    Pernyataan sedang dimuatkan...
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="answerTF(true)" class="p-4 rounded-xl border-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-extrabold text-base flex flex-col items-center gap-1 transition">
+                        <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                        <span>BENAR</span>
+                    </button>
+                    <button onclick="answerTF(false)" class="p-4 rounded-xl border-2 border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 font-extrabold text-base flex flex-col items-center gap-1 transition">
+                        <i data-lucide="x-circle" class="w-6 h-6"></i>
+                        <span>PALSU</span>
+                    </button>
+                </div>
+                <div id="tfFeedback" class="hidden p-4 rounded-xl border text-xs font-medium"></div>
+            </div>
+
+            <!-- BOTTOM FOOTER ACTION BUTTONS -->
+            <div class="pt-5 border-t border-slate-100 flex items-center justify-between mt-6">
+                <button id="prevBtn" onclick="prevQuestion()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold text-xs transition flex items-center gap-1">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i> Sebelum
+                </button>
+                <button onclick="openModal('certInputModal')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20 font-extrabold text-xs transition flex items-center gap-2">
+                    <i data-lucide="award" class="w-4 h-4"></i> Jana Sijil Pencapaian
+                </button>
+                <button id="nextBtn" onclick="nextQuestion()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition flex items-center gap-1">
+                    Seterusnya <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CERTIFICATE DETAILS INPUT MODAL -->
+    <div id="certInputModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100">
+            <div class="text-center mb-6">
+                <div class="inline-flex p-3 rounded-2xl bg-amber-100 text-amber-600 mb-3">
+                    <i data-lucide="award" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-2xl font-black text-slate-800">Jana Sijil Ulang Kaji</h2>
+                <p class="text-xs text-slate-500 mt-1">Sila masukkan nama dan kelas anda untuk dipaparkan pada sijil akhir.</p>
+            </div>
+            
+            <form onsubmit="generateCertificate(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nama Penuh Murid</label>
+                    <input type="text" id="certStudentName" required placeholder="cth: Ahmad Bin Abdullah" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kelas</label>
+                    <input type="text" id="certStudentClass" required placeholder="cth: 2 Angsana" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm font-medium">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeModal('certInputModal')" class="w-1/3 py-3 bg-slate-100 text-slate-600 font-bold text-xs rounded-xl hover:bg-slate-200 transition">Batal</button>
+                    <button type="submit" class="w-2/3 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-500/25 transition">Bina Sijil Saya &rarr;</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CERTIFICATE MODAL VIEW -->
+    <div id="certModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto hidden">
+        <div class="max-w-3xl w-full my-auto space-y-4">
+            
+            <!-- Screenshot Instructions -->
+            <div class="no-print bg-amber-500/20 border border-amber-400/40 rounded-2xl p-4 text-amber-200 text-xs font-medium flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="camera" class="w-6 h-6 text-amber-300 shrink-0"></i>
+                    <span><strong>ARAHAN:</strong> Sila ambil <strong>Screenshot (Tangkapan Skrin)</strong> sijil ini dan hantarkan kepada guru Geografi anda sebagai bukti tugasan!</span>
+                </div>
+                <button onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-amber-400 text-slate-900 font-bold text-xs hover:bg-amber-300 shrink-0">Simpan / Cetak PDF</button>
+            </div>
+
+            <!-- CERTIFICATE DISPLAY BOARD -->
+            <div id="certContainer" class="bg-amber-50/90 border-[12px] border-double border-amber-600 rounded-3xl p-8 sm:p-12 text-center text-slate-800 shadow-2xl relative overflow-hidden">
+                <!-- Watermark Background Icon -->
+                <i data-lucide="globe" class="w-96 h-96 absolute -bottom-20 -right-20 text-amber-200/30 -z-0 pointer-events-none"></i>
+
+                <!-- Cert Header -->
+                <div class="space-y-2 relative z-10">
+                    <p class="text-xs font-black uppercase tracking-[0.3em] text-amber-700">SIJIL PENCAPAIAN INTERAKTIF</p>
+                    <h2 class="text-2xl sm:text-4xl font-black font-serif-title text-slate-900 tracking-tight">Geografi Tingkatan 2</h2>
+                    <p class="text-xs text-slate-600 font-medium">Bahagian C: Soalan Ulang Kaji Interaktif (Topik 1 - Topik 4)</p>
+                </div>
+
+                <div class="my-6 border-b border-amber-300 w-1/2 mx-auto"></div>
+
+                <!-- Student Info -->
+                <div class="space-y-1 relative z-10">
+                    <p class="text-xs text-slate-500 uppercase font-semibold">Dengan ini diperakui bahawa</p>
+                    <h3 id="certDisplayScoreName" class="text-2xl sm:text-3xl font-black text-indigo-950 underline decoration-amber-400 decoration-2 underline-offset-4">NAMA MURID</h3>
+                    <p id="certDisplayScoreClass" class="text-sm font-bold text-slate-700 mt-1">Kelas: -</p>
+                </div>
+
+                <p class="text-xs text-slate-600 mt-4 max-w-md mx-auto relative z-10">Telah berjaya menyempurnakan aktiviti Kuiz, Padanan Fakta, dan Benar/Palsu bagi modul pembelajaran Geografi Tingkatan 2.</p>
+
+                <!-- Score Breakdowns Table -->
+                <div class="my-6 grid grid-cols-2 sm:grid-cols-4 gap-2 text-left text-xs relative z-10 max-w-xl mx-auto">
+                    <div class="bg-white/80 p-2.5 rounded-xl border border-amber-200">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Topik 1</p>
+                        <p id="certScoreT1" class="font-extrabold text-slate-800 text-sm">0 / 20</p>
+                    </div>
+                    <div class="bg-white/80 p-2.5 rounded-xl border border-amber-200">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Topik 2</p>
+                        <p id="certScoreT2" class="font-extrabold text-slate-800 text-sm">0 / 20</p>
+                    </div>
+                    <div class="bg-white/80 p-2.5 rounded-xl border border-amber-200">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Topik 3</p>
+                        <p id="certScoreT3" class="font-extrabold text-slate-800 text-sm">0 / 20</p>
+                    </div>
+                    <div class="bg-white/80 p-2.5 rounded-xl border border-amber-200">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Topik 4</p>
+                        <p id="certScoreT4" class="font-extrabold text-slate-800 text-sm">0 / 20</p>
+                    </div>
+                </div>
+
+                <!-- Final Grade Badge -->
+                <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl p-4 max-w-md mx-auto shadow-lg flex items-center justify-between relative z-10">
+                    <div class="text-left">
+                        <p class="text-[10px] uppercase font-extrabold text-amber-100 tracking-wider">JUMLAH KESELURUHAN</p>
+                        <p id="certGrandTotal" class="text-2xl font-black">0 / 80</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] uppercase font-extrabold text-amber-100 tracking-wider">GRED PENCAPAIAN</p>
+                        <p id="certGrade" class="text-lg font-black text-amber-200">CEMERLANG</p>
+                    </div>
+                </div>
+
+                <!-- Footer Timestamp & Seal -->
+                <div class="mt-8 pt-4 border-t border-amber-200/60 flex items-center justify-between text-[10px] text-slate-500 relative z-10">
+                    <p id="certDate">Tarikh: -</p>
+                    <p class="font-semibold text-amber-800 uppercase tracking-widest">Aplikasi Ulang Kaji Geografi T2</p>
+                </div>
+            </div>
+
+            <!-- Close Modal Button -->
+            <div class="text-center no-print">
+                <button onclick="closeModal('certModal')" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition">
+                    Tutup Sijil
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- NOTA MODAL -->
+    <div id="notesModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[80vh] flex flex-col shadow-2xl">
+            <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-5 h-5 text-indigo-600"></i>
+                    <h3 class="text-lg font-black text-slate-800">Nota Ringkas Geografi T2</h3>
+                </div>
+                <button onclick="closeModal('notesModal')" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 bg-slate-100">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-4 text-xs text-slate-600 leading-relaxed">
+                <div class="p-4 rounded-xl bg-blue-50 border border-blue-100 space-y-1">
+                    <h4 class="font-extrabold text-blue-800 text-sm">TOPIK 1: Pengangkutan</h4>
+                    <p>• <strong>Faktor:</strong> Tanah pamah mudah dibina jalan, kawasan padat penduduk perlu jaringan rapat, kawasan ekonomi (industri/pertanian).</p>
+                    <p>• <strong>Kepentingan:</strong> Memudahkan pergerakan, memajukan ekonomi, peluang pekerjaan, galak pelancongan.</p>
+                </div>
+                <div class="p-4 rounded-xl bg-purple-50 border border-purple-100 space-y-1">
+                    <h4 class="font-extrabold text-purple-800 text-sm">TOPIK 2: Telekomunikasi</h4>
+                    <p>• <strong>Kepentingan:</strong> E-pembelajaran, atasi masalah jarak, kongsi bahan maklumat, tingkat kemahiran digital.</p>
+                    <p>• <strong>Kesan Negatif:</strong> Ketagihan internet, siberbuli, penyebaran maklumat palsu, gangguan kesihatan mata & tidur.</p>
+                </div>
+                <div class="p-4 rounded-xl bg-amber-50 border border-amber-100 space-y-1">
+                    <h4 class="font-extrabold text-amber-800 text-sm">TOPIK 3: Pemanasan Global</h4>
+                    <p>• <strong>Faktor Semula Jadi:</strong> Aktiviti matahari, gunung berapi, perubahan orbit bumi & atmosfera.</p>
+                    <p>• <strong>Kesan:</strong> Peningkatan aras laut (pantai tenggelam), cuaca ekstrem (gelombang haba, kemarau, ribut).</p>
+                </div>
+                <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+                    <h4 class="font-extrabold text-emerald-800 text-sm">TOPIK 4: Teknologi Hijau</h4>
+                    <p>• <strong>Kepentingan:</strong> Kurangkan pencemaran & gas rumah hijau, jimat tenaga, tingkat kualiti hidup.</p>
+                    <p>• <strong>Amalan:</strong> Amalan 5R, tenaga solar, guna pengangkutan awam, berjalan/berbasikal, menanam pokok.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DATA & APP LOGIC -->
+    <script>
+        const topicData = {
+            1: {
+                title: "Topik 1: Pengangkutan",
+                desc: "Faktor pembinaan jaringan pengangkutan & kepentingan pengangkutan darat.",
+                quiz: [
+                    { q: "Mengapakah kawasan tanah pamah lebih mudah dibina jaringan jalan raya?", options: ["Kos pembinaan percuma", "Muka bumi yang rata memudahkan pembinaan", "Kawasan tanah pamah tiada hujan", "Dilarang membina terowong"], answer: 1, explanation: "Kawasan tanah pamah rata dan tidak memerlukan kos lereng yang tinggi." },
+                    { q: "Bagaimanakah pola petempatan mempengaruhi jaringan pengangkutan?", options: ["Kawasan berpenduduk ramai perlukan jaringan lebih padat", "Kawasan padat penduduk tidak perlukan jalan raya", "Pola petempatan hanya untuk laluan kereta api", "Hanya kawasan hutan perlukan lebuh raya"], answer: 0, explanation: "Petempatan padat memerlukan akses pengangkutan yang tinggi." },
+                    { q: "Apakah peranan kemajuan teknologi dalam bidang pengangkutan?", options: ["Membolehkan pembinaan jambatan dan terowong", "Menghapuskan penggunaan kenderaan awam", "Menyebabkan jalan raya cepat rosak", "Mengurangkan pembinaan jalan tar"], answer: 0, explanation: "Teknologi moden membolehkan penerokaan terowong dan jambatan tinggi." },
+                    { q: "Antara berikut, yang manakah kepentingan pengangkutan darat kepada masyarakat?", options: ["Memudahkan pergerakan penduduk", "Mengurangkan peluang pekerjaan", "Menurunkan taraf hidup", "Menyebabkan kesesakan berpanjangan"], answer: 0, explanation: "Pengangkutan darat mempercepat pergerakan harian masyarakat." },
+                    { q: "Bagaimanakah pengangkutan darat membantu sektor ekonomi?", options: ["Mengembangkan kegiatan perdagangan dan industri", "Menutup kedai tempatan", "Menghalang pengangkutan barangan", "Mengurangkan eksport negara"], answer: 0, explanation: "Logistik darat menghubungkan kilang, pasaran, dan pelabuhan." },
+                    { q: "Pengangkutan darat yang cekap dapat menggalakkan sektor...", options: ["Pelancongan", "Pembaziran tenaga", "Pencemaran berlebihan", "Pertanian tradisional sahaja"], answer: 0, explanation: "Pelancong mudah bergerak ke destinasi menarik." },
+                    { q: "Faktor ekonomi yang mempengaruhi jaringan pengangkutan merangkumi...", options: ["Kawasan industri, pertanian dan perdagangan", "Kawasan gunung-ganang terpencil", "Kawasan dasar laut", "Kawasan tanah tinggi curam"], answer: 0, explanation: "Hab ekonomi perlukan ketersambungan pengangkutan." }
+                ],
+                match: [
+                    { id: 1, fact: "Bentuk Muka Bumi", desc: "Tanah pamah memudahkan pembinaan jalan raya" },
+                    { id: 2, fact: "Pola Petempatan", desc: "Kawasan ramai penduduk perlukan jaringan padat" },
+                    { id: 3, fact: "Ekonomi", desc: "Kawasan industri & pertanian perlukan pengangkutan" },
+                    { id: 4, fact: "Kemajuan Teknologi", desc: "Memudahkan pembinaan jambatan & terowong" },
+                    { id: 5, fact: "Peluang Pekerjaan", desc: "Mewujudkan jawatan seperti pemandu & jurutera" },
+                    { id: 6, fact: "Pelancongan", desc: "Memudahkan pelancong sampai ke destinasi popular" }
+                ],
+                tf: [
+                    { q: "Tanah tinggi dan curam adalah kawasan paling mudah dibina lebuh raya.", answer: false, explanation: "Tanah tinggi memerlukan kos tinggi dan pemotongan cerun." },
+                    { q: "Pengangkutan darat membantu meningkatkan taraf hidup penduduk.", answer: true, explanation: "Ia menyediakan akses kepada perkhidmatan, kerja, dan pendidikan." },
+                    { q: "Teknologi moden membolehkan pembinaan terowong menembusi banjaran gunung.", answer: true, explanation: "Contohnya Terowong Genting Sempah." },
+                    { q: "Kawasan berpenduduk jarang memerlukan jaringan pengangkutan paling padat.", answer: false, explanation: "Kawasan berpenduduk ramai yang memerlukan jaringan padat." },
+                    { q: "Pengangkutan darat memudahkan akses kepada pusat pendidikan.", answer: true, explanation: "Pelajar mudah ke sekolah/universiti." },
+                    { q: "Aktiviti perdagangan tidak bergantung pada pengangkutan darat.", answer: false, explanation: "Penghantaran barangan amat bergantung pada lori dan jalan raya." },
+                    { q: "Pembinaan jalan raya di tanah pamah mengurangkan kos pembinaan.", answer: true, explanation: "Kerana tidak memerlukan perataan tanah yang ekstrem." }
+                ]
+            },
+            2: {
+                title: "Topik 2: Telekomunikasi",
+                desc: "Kepentingan telekomunikasi dalam pendidikan & kesan negatif jika tidak dikawal.",
+                quiz: [
+                    { q: "Antara berikut, yang manakah kepentingan telekomunikasi dalam pendidikan?", options: ["Memudahkan pembelajaran dalam talian", "Menyebabkan murid malas membaca", "Mengurangkan kemahiran digital", "Menyebabkan gangguan komunikasi"], answer: 0, explanation: "Telekomunikasi membolehkan e-learning dan kelas maya." },
+                    { q: "Bagaimanakah telekomunikasi membantu mengatasinya masalah jarak?", options: ["Membolehkan perhubungan secara real-time dari mana-mana lokasi", "Menghapuskan keperluan sekolah", "Memastikan semua murid tinggal bersebelahan", "Menghantar surat fizikal lebih cepat"], answer: 0, explanation: "Aplikasi panggilan video merapatkan jarak fizikal." },
+                    { q: "Apakah kesan negatif telekomunikasi jika tidak dikawal?", options: ["Ketagihan internet dan siberbuli", "Peningkatan gred ujian", "Mata menjadi semakin segar", "Tidur menjadi lebih teratur"], answer: 0, explanation: "Penggunaan tanpa kawalan membawa ketagihan dan siberbuli." },
+                    { q: "Penyebaran maklumat palsu boleh berlaku akibat...", options: ["Penyalahgunaan media sosial tanpa semakan", "Membaca buku di perpustakaan", "Belajar bersama guru di kelas", "Mendengar radio rasmi"], answer: 0, explanation: "Media sosial membolehkan maklumat tidak sahih tersebar pantas." },
+                    { q: "Apakah masalah kesihatan yang kerap dikaitkan dengan skrin berlebihan?", options: ["Masalah penglihatan mata dan kurang tidur", "Sakit gigi", "Patah tulang", "Kurang selera makan"], answer: 0, explanation: "Cahaya biru skrin menjejaskan mata dan hormon tidur." },
+                    { q: "Perkongsian bahan pembelajaran kini lebih mudah melalui...", options: ["Aplikasi awan (cloud) dan e-mel", "Surat berdaftar", "Telegram talian tetap lama", "Mesin faks lama"], answer: 0, explanation: "Platform digital memudahkan pemindahan fail." },
+                    { q: "Prestasi akademik murid boleh terjejas jika...", options: ["Terlalu banyak masa dihabiskan untuk permainan dalam talian", "Sering mengulangi kaji nota", "Menggunakan carian web untuk kerja sekolah", "Menghadiri e-kelas"], answer: 0, explanation: "Masa belajar terabai akibat gangguan gajet." }
+                ],
+                match: [
+                    { id: 1, fact: "E-Pembelajaran", desc: "Pembelajaran dijalankan dalam talian secara fleksibel" },
+                    { id: 2, fact: "Atasi Masalah Jarak", desc: "Berhubung secara langsung dari pelbagai lokasi" },
+                    { id: 3, fact: "Ketagihan Internet", desc: "Penggunaan skrin berlebihan tanpa kawalan masa" },
+                    { id: 4, fact: "Siberbuli", desc: "Ancaman dan pencerobohan emosi dalam talian" },
+                    { id: 5, fact: "Kemahiran Digital", desc: "Meningkatkan kecekapan murid guna perisian moden" },
+                    { id: 6, fact: "Maklumat Palsu", desc: "Penyebaran berita yang tidak disahkan kesahihannya" }
+                ],
+                tf: [
+                    { q: "Telekomunikasi membolehkan perkongsian bahan belajar secara segera.", answer: true, explanation: "Bahan digital boleh dihantar serta-merta." },
+                    { q: "Siberbuli ialah kesan positif penggunaan media sosial.", answer: false, explanation: "Siberbuli ialah kesan negatif yang berbahaya." },
+                    { q: "Penggunaan gajet sebelum tidur boleh mengganggu kualiti tidur.", answer: true, explanation: "Cahaya biru menghalang rembesan melatonin." },
+                    { q: "Telekomunikasi mengurangkan kemahiran digital murid.", answer: false, explanation: "Ia meningkatkan literasi dan kemahiran digital." },
+                    { q: "Murid lebih mudah terpengaruh dengan kandungan negatif jika tiada kawalan.", answer: true, explanation: "Akses tanpa had mendedahkan kepada risiko kandungan tidak sesuai." },
+                    { q: "Maklumat palsu hanya boleh disebarkan melalui surat khabar.", answer: false, explanation: "Internet adalah medium paling pantas maklumat palsu tersebar." },
+                    { q: "Telekomunikasi memudahkan guru dan murid berinteraksi dari jauh.", answer: true, explanation: "Melalui Google Meet, Zoom, atau WhatsApp." }
+                ]
+            },
+            3: {
+                title: "Topik 3: Pemanasan Global",
+                desc: "Faktor semula jadi pemanasan global, peningkatan aras laut & gangguan cuaca.",
+                quiz: [
+                    { q: "Antara berikut, yang manakah faktor semula jadi pemanasan global?", options: ["Letusan gunung berapi", "Pembakaran sampah terbuka", "Asap kilang industri", "Penggunaan pendingin udara"], answer: 0, explanation: "Letusan gunung berapi membebaskan debu dan gas semula jadi." },
+                    { q: "Apakah kesan utama peningkatan aras laut?", options: ["Kawasan pantai ditenggelami air", "Peningkatan kawasan pertanian", "Penurunan suhu laut", "Pembentukan pulau baru"], answer: 0, explanation: "Pencairan ais kutub meningkatkan aras laut dan menenggelamkan pantai." },
+                    { q: "Perubahan orbit bumi boleh menyebabkan...", options: ["Pemanasan global secara semula jadi", "Letusan gunung berapi", "Pembentukan hujan asid", "Kesesakan lalu lintas"], answer: 0, explanation: "Variasi orbit bumi mempengaruhi penerimaan pancaran matahari." },
+                    { q: "Gangguan cuaca akibat pemanasan global termasuklah...", options: ["Gelombang haba dan kemarau berpanjangan", "Matahari terbit dari barat", "Hujan salji di garisan khatulistiwa setiap hari", "Suhu kekal sejuk sepanjang tahun"], answer: 0, explanation: "Perubahan iklim menyebabkan gelombang haba ekstrem." },
+                    { q: "Mengapakah pulau-pulau kecil terancam akibat pemanasan global?", options: ["Aras laut meningkat dan menenggelamkan daratan", "Pulau menjadi terlalu sejuk", "Semua pokok di pulau tumbang", "Angin pantai terhenti"], answer: 0, explanation: "Aras laut naik dengan cepat menenggelamkan pesisir pantai." },
+                    { q: "Apakah yang dimaksudkan dengan perubahan semula jadi atmosfera?", options: ["Perubahan kandungan gas perangkap haba secara alami", "Pencemaran buatan manusia", "Pembinaan empangan", "Penanaman semula hutan"], answer: 0, explanation: "Perubahan komposisi atmosfera secara fluktuasi semula jadi." },
+                    { q: "Kesan hakisan pantai bertambah teruk disebabkan oleh...", options: ["Peningkatan aras laut dan ombak kuat", "Pengurangan kedalaman laut", "Penanaman pokok bakau", "Pembinaan benteng pasir"], answer: 0, explanation: "Ombak pesat semasa aras laut tinggi menghakis pantai." }
+                ],
+                match: [
+                    { id: 1, fact: "Aktiviti Matahari", desc: "Pancaran radiasi matahari melampau tingkat suhu bumi" },
+                    { id: 2, fact: "Gunung Berapi", desc: "Pembebasan gas & debu semula jadi ke atmosfera" },
+                    { id: 3, fact: "Aras Laut Naik", desc: "Pencairan ais kutub tenggelamkan kawasan pantai" },
+                    { id: 4, fact: "Gelombang Haba", desc: "Fenomena cuaca panas ekstrem melampau" },
+                    { id: 5, fact: "Hakisan Pantai", desc: "Kemusnahan garis pantai akibat peningkatan air laut" },
+                    { id: 6, fact: "Kemarau", desc: "Kekurangan taburan hujan dalam tempoh panjang" }
+                ],
+                tf: [
+                    { q: "Letusan gunung berapi adalah punca pemanasan global buatan manusia.", answer: false, explanation: "Gunung berapi adalah faktor semula jadi." },
+                    { q: "Pemanasan global menyebabkan corak hujan menjadi tidak menentu.", answer: true, explanation: "Perubahan iklim mengganggu kitaran hidrologi." },
+                    { q: "Pencairan ais di kutub tidak memberi kesan kepada aras laut.", answer: false, explanation: "Isipadu air bertambah dan meningkatkan aras laut." },
+                    { q: "Gelombang haba boleh menjejaskan kesihatan manusia.", answer: true, explanation: "Boleh menyebabkan kelesuan haba dan strok haba." },
+                    { q: "Perubahan orbit bumi mempengaruhi jumlah radiasi matahari yang diterima.", answer: true, explanation: "Kitaran Milankovitch mempengaruhi iklim bumi." },
+                    { q: "Penduduk di kawasan pantai mungkin terpaksa berpindah jika aras laut naik.", answer: true, explanation: "Kerana daratan mereka ditenggelami air." },
+                    { q: "Pemanasan global mengurangkan risiko kejadian banjir kilat.", answer: false, explanation: "Cuaca ekstrem meningkatkan risiko hujan lebat dan banjir." }
+                ]
+            },
+            4: {
+                title: "Topik 4: Teknologi Hijau",
+                desc: "Kepentingan teknologi hijau & amalan berkonsepkan kelestarian alam sekitar.",
+                quiz: [
+                    { q: "Apakah tujuan utama pelaksanaan Teknologi Hijau?", options: ["Mengurangkan pencemaran dan pelepasan gas rumah hijau", "Meningkatkan kos tenaga elektrik", "Menghapuskan penanaman pokok", "Menggalakkan penggunaan bahan api fosil"], answer: 0, explanation: "Teknologi hijau bertujuan melestarikan alam sekitar." },
+                    { q: "Antara berikut, yang manakah amalan berkonsepkan Teknologi Hijau?", options: ["Menggunakan pengangkutan awam dan berjalan kaki", "Membakar sampah terbuka", "Membazirkan tenaga elektrik", "Menggunakan plastik sekali guna"], answer: 0, explanation: "Pengangkutan awam mengurangkan pelepasan karbon." },
+                    { q: "Amalan 5R merangkumi Refuse, Reduce, Reuse, Recycle dan...", options: ["Rot", "Run", "Remove", "Repair"], answer: 0, explanation: "Rot merujuk kepada pengomposan sisa organik." },
+                    { q: "Penggunaan tenaga solar merupakan contoh...", options: ["Sumber tenaga boleh baharu yang bersih", "Sumber tenaga pembakar toksik", "Pencemaran udara", "Sisa tidak boleh dikitar semula"], answer: 0, explanation: "Solar memanfaatkan tenaga cahaya matahari secara lestari." },
+                    { q: "Bagaimanakah penanaman pokok membantu alam sekitar?", options: ["Menyerap karbon dioksida dan membebaskan oksigen", "Menyebabkan suhu bumi makin panas", "Mengurangkan kualiti udara", "Menghalang laluan angin"], answer: 0, explanation: "Tumbuhan bertindak sebagai penyerap karbon alami." },
+                    { q: "Pembangunan lestari bermaksud...", options: ["Pembangunan yang memenuhi keperluan tanpa menjejaskan generasi depan", "Pembangunan cepat tanpa hiraukan hutan", "Eksploitasi sumber sehingga habis", "Membina kilang di semua hutan"], answer: 0, explanation: "Mengimbangi kemajuan ekonomi dengan pemuliharaan alam." },
+                    { q: "Langkah menjimatkan elektrik di rumah termasuklah...", options: ["Matikan suis peralatan apabila tidak digunakan", "Biarkan lampu terpasang siang dan malam", "Guna penyaman udara pada suhu 16°C sepanjang hari", "Buka pintu peti ais berterusan"], answer: 0, explanation: "Mematikan suis teras mengurangkan pembaziran tenaga." }
+                ],
+                match: [
+                    { id: 1, fact: "Amalan 5R", desc: "Refuse, Reduce, Reuse, Recycle, Rot" },
+                    { id: 2, fact: "Tenaga Solar", desc: "Memanfaatkan tenaga matahari sebagai tenaga bersih" },
+                    { id: 3, fact: "Pengangkutan Awam", desc: "Mengurangkan pelepasan asap karbon di jalan raya" },
+                    { id: 4, fact: "Penanaman Pokok", desc: "Meningkatkan oksigen & menyerap karbon dioksida" },
+                    { id: 5, fact: "Pembangunan Lestari", desc: "Menjamin kesejahteraan alam untuk generasi masa depan" },
+                    { id: 6, fact: "Penjimatan Elektrik", desc: "Mematikan suis peranti elektrik jika tidak digunakan" }
+                ],
+                tf: [
+                    { q: "Teknologi Hijau mengurangkan pelepasan gas rumah hijau.", answer: true, explanation: "Ia berfokus pada sumber tenaga mesra alam." },
+                    { q: "Berjalan kaki atau berbasikal ke sekolah membantu melestarikan alam.", answer: true, explanation: "Tiada pembebasan asap ekzos kenderaan." },
+                    { q: "Amalan 5R hanya merangkumi Reduce dan Reuse sahaja.", answer: false, explanation: "Ia merangkumi Refuse, Reduce, Reuse, Recycle, Rot." },
+                    { q: "Tenaga solar menyebabkan pencemaran udara yang teruk.", answer: false, explanation: "Tenaga solar adalah sumber tenaga bersih." },
+                    { q: "Teknologi Hijau membantu menjamin pembangunan lestari.", answer: true, explanation: "Memastikan sumber alam terpelihara." },
+                    { q: "Menggunakan beg plastik sekali guna adalah amalan kelestarian.", answer: false, explanation: "Beg plastik mencemarkan alam sekitar." },
+                    { q: "Menanam pokok di kawasan sekolah mengurangkan suhu persekitaran.", answer: true, explanation: "Pokok memberikan teduhan dan menyerap haba." }
+                ]
+            }
+        };
+
+        let currentTopic = 1;
+        let currentActivity = 1;
+        
+        let currentQuizIdx = 0;
+        let currentTFIdx = 0;
+        
+        let selectedFact = null;
+        let matchedPairs = 0;
+
+        let scores = {
+            1: { quiz: 0, match: 0, tf: 0 },
+            2: { quiz: 0, match: 0, tf: 0 },
+            3: { quiz: 0, match: 0, tf: 0 },
+            4: { quiz: 0, match: 0, tf: 0 }
+        };
+
+        window.onload = function() {
+            lucide.createIcons();
+            loadActivity();
+        };
+
+        function switchTopic(topicId) {
+            currentTopic = topicId;
+            currentQuizIdx = 0;
+            currentTFIdx = 0;
+            matchedPairs = 0;
+            selectedFact = null;
+
+            for(let i=1; i<=4; i++) {
+                const card = document.getElementById(`topic-card-${i}`);
+                if(i === topicId) {
+                    card.classList.add('border-indigo-600');
+                    card.classList.remove('border-slate-200');
+                } else {
+                    card.classList.remove('border-indigo-600');
+                    card.classList.add('border-slate-200');
+                }
+            }
+
+            const data = topicData[topicId];
+            document.getElementById('topicBadge').innerText = `Topik ${topicId}`;
+            document.getElementById('topicTitle').innerText = data.title;
+            document.getElementById('topicDesc').innerText = data.desc;
+
+            loadActivity();
+        }
+
+        function switchActivity(actId) {
+            currentActivity = actId;
+            for(let i=1; i<=3; i++) {
+                const tab = document.getElementById(`act-tab-${i}`);
+                const panel = document.getElementById(`activity-${i}`);
+                if(i === actId) {
+                    tab.className = "act-tab px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 bg-indigo-600 text-white shadow-sm";
+                    panel.classList.remove('hidden');
+                } else {
+                    tab.className = "act-tab px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-50 border border-slate-200";
+                    panel.classList.add('hidden');
+                }
+            }
+            loadActivity();
+        }
+
+        function loadActivity() {
+            if(currentActivity === 1) renderQuiz();
+            else if(currentActivity === 2) renderMatch();
+            else if(currentActivity === 3) renderTF();
+            updateScores();
+        }
+
+        function renderQuiz() {
+            const quizList = topicData[currentTopic].quiz;
+            const q = quizList[currentQuizIdx];
+            document.getElementById('quizProgress').innerText = `Soalan ${currentQuizIdx + 1} daripada ${quizList.length}`;
+            document.getElementById('quizQuestion').innerText = q.q;
+
+            const optsContainer = document.getElementById('quizOptions');
+            optsContainer.innerHTML = '';
+            document.getElementById('quizFeedback').className = "hidden p-4 rounded-xl border text-xs font-medium";
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 text-slate-700 font-semibold text-xs text-left transition flex items-center justify-between";
+                btn.innerHTML = `<span>${opt}</span><i data-lucide="circle" class="w-4 h-4 text-slate-300"></i>`;
+                btn.onclick = () => checkQuiz(idx, q.answer, q.explanation);
+                optsContainer.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        function checkQuiz(selected, correct, exp) {
+            const feedback = document.getElementById('quizFeedback');
+            feedback.classList.remove('hidden');
+            if(selected === correct) {
+                scores[currentTopic].quiz = Math.min(7, scores[currentTopic].quiz + 1);
+                feedback.className = "p-4 rounded-xl border text-xs font-bold bg-emerald-50 border-emerald-200 text-emerald-800";
+                feedback.innerHTML = `✓ Tahniah! Jawapan anda betul.<br><span class="font-normal text-emerald-600">${exp}</span>`;
+            } else {
+                feedback.className = "p-4 rounded-xl border text-xs font-bold bg-rose-50 border-rose-200 text-rose-800";
+                feedback.innerHTML = `✕ Jawapan kurang tepat.<br><span class="font-normal text-rose-600">${exp}</span>`;
+            }
+            updateScores();
+        }
+
+        function renderMatch() {
+            const matchData = topicData[currentTopic].match;
+            const factsContainer = document.getElementById('factsList');
+            const descContainer = document.getElementById('descList');
+            factsContainer.innerHTML = '';
+            descContainer.innerHTML = '';
+
+            let shuffledDesc = [...matchData].sort(() => Math.random() - 0.5);
+
+            matchData.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `fact-${item.id}`;
+                btn.className = "w-full p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-indigo-50 text-slate-800 font-bold text-xs text-left transition";
+                btn.innerText = item.fact;
+                btn.onclick = () => selectFact(item.id);
+                factsContainer.appendChild(btn);
+            });
+
+            shuffledDesc.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `desc-${item.id}`;
+                btn.className = "w-full p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-purple-50 text-slate-700 font-medium text-xs text-left transition";
+                btn.innerText = item.desc;
+                btn.onclick = () => selectDesc(item.id);
+                descContainer.appendChild(btn);
+            });
+
+            document.getElementById('matchProgress').innerText = `${matchedPairs} / 6 Padanan`;
+        }
+
+        function selectFact(id) {
+            if(selectedFact) {
+                document.getElementById(`fact-${selectedFact}`).classList.remove('border-indigo-600', 'bg-indigo-100');
+            }
+            selectedFact = id;
+            document.getElementById(`fact-${id}`).classList.add('border-indigo-600', 'bg-indigo-100');
+        }
+
+        function selectDesc(id) {
+            if(!selectedFact) return;
+            if(selectedFact === id) {
+                document.getElementById(`fact-${id}`).className = "w-full p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-bold text-xs text-left cursor-default";
+                document.getElementById(`desc-${id}`).className = "w-full p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-medium text-xs text-left cursor-default";
+                matchedPairs++;
+                scores[currentTopic].match = matchedPairs;
+                document.getElementById('matchProgress').innerText = `${matchedPairs} / 6 Padanan`;
+                selectedFact = null;
+                if(matchedPairs === 6) confetti();
+            } else {
+                alert("Padanan tidak tepat, sila cuba lagi!");
+                document.getElementById(`fact-${selectedFact}`).classList.remove('border-indigo-600', 'bg-indigo-100');
+                selectedFact = null;
+            }
+            updateScores();
+        }
+
+        function renderTF() {
+            const tfList = topicData[currentTopic].tf;
+            const q = tfList[currentTFIdx];
+            document.getElementById('tfProgress').innerText = `Soalan ${currentTFIdx + 1} daripada ${tfList.length}`;
+            document.getElementById('tfQuestion').innerText = q.q;
+            document.getElementById('tfFeedback').className = "hidden p-4 rounded-xl border text-xs font-medium";
+        }
+
+        function answerTF(ans) {
+            const q = topicData[currentTopic].tf[currentTFIdx];
+            const feedback = document.getElementById('tfFeedback');
+            feedback.classList.remove('hidden');
+
+            if(ans === q.answer) {
+                scores[currentTopic].tf = Math.min(7, scores[currentTopic].tf + 1);
+                feedback.className = "p-4 rounded-xl border text-xs font-bold bg-emerald-50 border-emerald-200 text-emerald-800";
+                feedback.innerHTML = `✓ Tepat sekali!<br><span class="font-normal text-emerald-600">${q.explanation}</span>`;
+            } else {
+                feedback.className = "p-4 rounded-xl border text-xs font-bold bg-rose-50 border-rose-200 text-rose-800";
+                feedback.innerHTML = `✕ Tidak tepat.<br><span class="font-normal text-rose-600">${q.explanation}</span>`;
+            }
+            updateScores();
+        }
+
+        function nextQuestion() {
+            if(currentActivity === 1) {
+                if(currentQuizIdx < topicData[currentTopic].quiz.length - 1) {
+                    currentQuizIdx++;
+                    renderQuiz();
+                }
+            } else if(currentActivity === 3) {
+                if(currentTFIdx < topicData[currentTopic].tf.length - 1) {
+                    currentTFIdx++;
+                    renderTF();
+                }
+            }
+        }
+
+        function prevQuestion() {
+            if(currentActivity === 1 && currentQuizIdx > 0) {
+                currentQuizIdx--;
+                renderQuiz();
+            } else if(currentActivity === 3 && currentTFIdx > 0) {
+                currentTFIdx--;
+                renderTF();
+            }
+        }
+
+        function updateScores() {
+            let grandTotal = 0;
+            for(let i=1; i<=4; i++) {
+                const topicTotal = scores[i].quiz + scores[i].match + scores[i].tf;
+                grandTotal += topicTotal;
+                document.getElementById(`prog-${i}`).innerText = `${topicTotal}/20 Dibereskan`;
+            }
+            document.getElementById('totalScoreDisplay').innerText = `${grandTotal} / 80`;
+        }
+
+        function generateCertificate(e) {
+            e.preventDefault();
+            const name = document.getElementById('certStudentName').value.trim();
+            const studentClass = document.getElementById('certStudentClass').value.trim();
+
+            if(!name || !studentClass) return;
+
+            document.getElementById('certDisplayScoreName').innerText = name.toUpperCase();
+            document.getElementById('certDisplayScoreClass').innerText = `Kelas: ${studentClass}`;
+
+            // Calculate Topic Scores
+            const t1 = scores[1].quiz + scores[1].match + scores[1].tf;
+            const t2 = scores[2].quiz + scores[2].match + scores[2].tf;
+            const t3 = scores[3].quiz + scores[3].match + scores[3].tf;
+            const t4 = scores[4].quiz + scores[4].match + scores[4].tf;
+            const grandTotal = t1 + t2 + t3 + t4;
+
+            document.getElementById('certScoreT1').innerText = `${t1} / 20`;
+            document.getElementById('certScoreT2').innerText = `${t2} / 20`;
+            document.getElementById('certScoreT3').innerText = `${t3} / 20`;
+            document.getElementById('certScoreT4').innerText = `${t4} / 20`;
+            document.getElementById('certGrandTotal').innerText = `${grandTotal} / 80`;
+
+            // Assign Grade
+            let grade = "LULUS";
+            if(grandTotal >= 64) grade = "CEMERLANG";
+            else if(grandTotal >= 48) grade = "KEPUJIAN";
+            else if(grandTotal >= 32) grade = "BAIK";
+
+            document.getElementById('certGrade').innerText = grade;
+            document.getElementById('certDate').innerText = `Tarikh: ${new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+
+            closeModal('certInputModal');
+            openModal('certModal');
+            confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    </script>
+</body>
+</html>
